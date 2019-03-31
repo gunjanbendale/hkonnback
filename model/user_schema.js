@@ -34,11 +34,13 @@ let donateblood = new Schema({
   _id : mongoose.Schema.Types.ObjectId,
   name : String,
   city : String,
+  area : String,
   brgp : String,
   age : Number,
   weight : Number,
   height : Number,
   lastdonated : String,
+  healthcond : String,
 });
 
 var bookanappt = mongoose.model('bookappt',bookappt);
