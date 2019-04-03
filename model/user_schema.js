@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 Schema = mongoose.Schema;
-mongoose.connect("mongodb://healthkonn_admin:healthkonn_1@ds239055.mlab.com:39055/healthkonn",{useNewUrlParser:true});
+mongoose.connect("mongodb://127.0.0.1:27017/hkonn",{useNewUrlParser:true});
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
@@ -11,6 +11,7 @@ let bookappt = new Schema({
   userId : mongoose.Schema.Types.ObjectId,
   city : String,
   Hospital : String,
+  age : String,
   patName : String,
   docName : String,
   docId : mongoose.Schema.Types.ObjectId,
@@ -20,12 +21,11 @@ let bookappt = new Schema({
 });
 
 let userprofile = new Schema({
-  _id : mongoose.Schema.Types.ObjectId,
+
   name : String,
   city : String,
   dob : String,
   password : String, 
-  address : String, 
   email : String,
   contact : Number,
 });

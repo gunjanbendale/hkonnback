@@ -1,5 +1,45 @@
 var mongoose = require('mongoose');
 var schema= require('./user_schema');
+var express = require('express');
+var api=express.Router();
+var expressValidator = require('express-validator');
+var bcrypt = require('bcrypt');
+var jwt = require('jsonwebtoken');
+api.use(expressValidator());
+
+const secret = "supersecretkey";
+function handleError(err, msg, res){
+  console.log(err);
+  if(msg == undefined){
+      msg = "there was some error at the server";
+  }
+  return res.json({
+      success:false,
+      msg: msg,
+      err:err
+  });
+};
+
+ function findByUsername(username,callback){
+  console.log(username);
+  schema.profile.findOne({email:username},callback);
+};
+
+function comparePassword(candidatepassword,password,callback){
+  bcrypt.compare(candidatepassword, password, function(err, isMatch){
+    if(err)return callback(err, false);
+  return callback(null, isMatch);
+})
+};
+function createUser(newUser, callback) {
+  bcrypt.hash(newUser.password, 10, function(err, hash){
+      if(err)throw err;
+      newUser.password = hash;
+      newUser.save(newUser, callback);
+  });
+};
+
+
 
 module.exports = {
    
@@ -16,13 +56,22 @@ module.exports = {
     },
    
    userprofile: function(req,res){
-      schema.profile.find({_id:req.params.id},function(err,docs){
+     var x = new mongoose.Types.ObjectId(req.params.id);
+     console.log(x);
+     //check
+      schema.profile.findOne(req.params.id,function(err,docs){
         if(err||!docs){
           console.log(err);
         }
         else{
-        res.json(docs);
-        console.log(docs);
+          console.log(docs);
+        return res.json({
+          
+          user:docs,
+          success: "true",
+          message : "user retrieved"
+        });
+        
         }
       });
     },
@@ -49,17 +98,7 @@ module.exports = {
       }
     });
   },
-  findByUsername : function(username,callback){
-    console.log(username);
-    schema.profile.findOne({email:username},callback);
-  },
-
-  comparePassword : function(candidatepassword,password,callback){
-    bcrypt.compare(candidatePassword, password, function(err, isMatch){
-      if(err)return callback(err, false);
-    return callback(null, isMatch);
-  })
-},
+  
 
   login :function(req,res){
      //extracting all the info from request parameters
@@ -101,7 +140,15 @@ module.exports = {
                  }
                  jwt.sign({id: user._id}, secret, function(err, token){
                      if(err)handleError(err, null, res);
-                     return getAllUserDashboardDetails(req, res, user._id, token);
+                     console.log(token);
+                     return res.json({
+                       success:"true",
+                       message:"login successful",
+                       token:token,
+                       _id:user._id,
+                       user : user,
+                     })
+                   //return getAllUserDashboardDetails(req, res, user._id, token);
                  })
              });
  
@@ -110,17 +157,13 @@ module.exports = {
  }
   },
 
-  createUser: function (newUser, callback) {
-    bcrypt.hash(newUser.password, 10, function(err, hash){
-        if(err)throw err;
-        newUser.password = hash;
-        newUser.save(newUser, callback);
-    });
-},
-  signup : function(res,res){
+  
+  signup : function(req,res){
     var name = req.body.name;
     var email = req.body.email;
-    var mobile = req.body.mobile;
+    var mobile = req.body.contact;
+    var city = req.body.city;
+    var dob = req.body.dob;
     var password = req.body.password;
     var address = req.body.address;
 
@@ -129,7 +172,7 @@ module.exports = {
 
     req.checkBody('name', 'Name cannot be empty').notEmpty();
     req.checkBody('email', 'Email cannot be empty').notEmpty();
-    req.checkBody('mobile', 'contact cannot be empty').notEmpty();
+    req.checkBody('contact', 'contact cannot be empty').notEmpty();
     //req.checkBody('pan', 'Pan cannot be empty').notEmpty();
     //req.checkBody('gstin', 'GSTIN cannot be empty').notEmpty();
     req.checkBody('email', "Enter a valid email").isEmail();
@@ -147,25 +190,27 @@ module.exports = {
         var newUser = new schema.profile({
             name:name,
             email:email,
-            mobile:mobile,
+            contact:mobile,
+            city:city,
+            dob:dob,
             address:address,
             password:password,
         });
 
-        User.createUser(newUser, function (err, user) {
-            if(err){
-                return handleError(err, null, res);
-            }else{
-                //console.log(user);
-                res.json({
-                    success:true,
-                    msg: 'user created'
-                });
-            }
-        });
+        createUser(newUser, function (err, user) {
+          if(err){
+              return handleError(err, null, res);
+          }else{
+              //console.log(user);
+              res.json({
+                  success:true,
+                  msg: 'user created'
+              });
+          }
+      });
     }
-
   },
-  
-  
-}
+
+
+
+  }
