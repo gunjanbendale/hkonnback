@@ -75,6 +75,29 @@ module.exports = {
         }
       });
     },
+  apptHistory : function(req,res){
+    var x = new mongoose.Types.ObjectId(req.params.id);
+    console.log(x);
+    schema.bookanappt.find({_id:req.params.id},function(err,docs){
+      if(err||!docs){
+        console.log(err);
+        return res.json({
+          success : "false",
+          message : "no data found"
+        });
+      }
+      else{
+        console.log(docs);
+        return res.json({
+          
+          data:docs,
+          success: "true",
+          message : "data retrieved"
+        });
+      }
+    });
+  
+  },
 
   donateblood : function(req,res){
       let donatebl = new schema.donate(req.body);
@@ -166,6 +189,7 @@ module.exports = {
     var dob = req.body.dob;
     var password = req.body.password;
     var address = req.body.address;
+    var category =req.body.category;
 
     //console.log(req.body.name);
     //console.log(name);
@@ -195,6 +219,7 @@ module.exports = {
             dob:dob,
             address:address,
             password:password,
+            category : category,
         });
 
         createUser(newUser, function (err, user) {

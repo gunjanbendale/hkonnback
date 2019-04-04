@@ -17,6 +17,7 @@ let bookappt = new Schema({
   docId : mongoose.Schema.Types.ObjectId,
   dateCurr : String,
   apptDate : String,
+  status : [String],
   apptTime : String,
 });
 
@@ -26,8 +27,10 @@ let userprofile = new Schema({
   city : String,
   dob : String,
   password : String, 
+  address : String,
   email : String,
   contact : Number,
+  category : Number,
 });
 
 let donateblood = new Schema({

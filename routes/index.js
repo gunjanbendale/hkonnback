@@ -23,8 +23,9 @@ router.post('/bookappt',controller.apptbook); //book an appointment
 router.post('/donateblood',controller.donateblood); //user wants to donate blood
 router.post('/searchbank',controller.searchbank); //user searches for blood bank nearby
 router.post('/profile',controller.userprofile);  //get user profile
-router.post('/login',controller.login);
-router.post('/signup',controller.signup);
+router.post('/login',controller.login);     //Login
+router.post('/signup',controller.signup);       // Signup new user
+router.post('/appthistory',controller.apptHistory);     // View All Appointments 
 
 function isAuthenticated(req, res, next){
   if(req.headers['authorization']){
