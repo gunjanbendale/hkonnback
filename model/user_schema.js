@@ -28,6 +28,7 @@ let userprofile = new Schema({
   dob : String,
   password : String, 
   address : String,
+  firebasecode : String,
   email : String,
   contact : Number,
   category : Number,
